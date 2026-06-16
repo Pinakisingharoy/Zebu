@@ -25,17 +25,19 @@ def login():
 
 
 @router.get("/callback")
-
-# @router.get("/callback")
-# def callback(code: str):
-#     ...
-
-
 def callback(code: str):
+
+    print("=" * 50)
+    print("AUTH CODE RECEIVED:")
+    print(code)
+    print("=" * 50)
 
     token_response = (
         MyntClient.generate_access_token(code)
     )
+
+    print("TOKEN RESPONSE:")
+    print(token_response)
 
     if token_response.get("stat") != "Ok":
 
@@ -52,9 +54,14 @@ def callback(code: str):
         token_response.get("refresh_token")
     )
 
+    session_data["uid"] = (
+        token_response.get("uid")
+    )
+
     return {
         "success": True,
-        "token": token_response.get(
+        "access_token":
+        token_response.get(
             "access_token"
         )
     }
