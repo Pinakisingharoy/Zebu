@@ -42,3 +42,13 @@ def home():
 def root_callback(code: str):
 
     return callback(code)
+
+from app.api.strategy import (
+    router as strategy_router
+)
+
+app.include_router(
+    strategy_router,
+    prefix="/strategy",
+    tags=["Strategy"]
+)
