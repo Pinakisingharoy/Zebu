@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-
 import pandas as pd
+import os
 
 from app.strategy.breakout_10candle import (
     Breakout10Candle
@@ -16,28 +16,29 @@ router = APIRouter()
 @router.post("/run")
 def run_strategy():
 
-    df = pd.read_csv(
-        "data/raw/NIFTY_1m.csv"
-    )
+    csv_file = "data/raw/NIFTY_1m.csv"
 
-    df["datetime"] = pd.to_datetime(
-    df["datetime"],
-    format="%d-%m-%Y %H:%M:%S"
-)
+    if not os.path.exists(csv_file):
 
-# MOST IMPORTANT
+        return {
+            "success": False,
+            "message": "Historical CSV not found"
+        }
 
-    df = df.sort_values(
-        "datetime"
-        ).reset_index(drop=True)
+    # Remove old trades
 
-    strategy = (
-        Breakout10Candle()
-    )
+    trade_file = "data/trades/trades.csv"
 
-    signals = (
-        strategy.generate_signals(df)
-    )
+    if os.path.exists(trade_file):
+        os.remove(trade_file)
+
+    # Load candles
+
+    df = pd.read_csv(csv_file)
+
+    strategy = Breakout10Candle()
+
+    signals = strategy.generate_signals(df)
 
     trades = []
 
@@ -49,15 +50,18 @@ def run_strategy():
             )
         )
 
-        trades.append(
-            trade
-        )
+        trades.append(trade)
 
     return {
 
-        "signals":
+        "success": True,
+
+        "signals_found":
         len(signals),
 
+        "trades_created":
+        len(trades),
+
         "trades":
-        len(trades)
+        trades
     }
