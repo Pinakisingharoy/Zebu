@@ -11,38 +11,66 @@ class Breakout10Candle(BaseStrategy):
 
         signals = []
 
-        df["close"] = df["close"].astype(float)
-        df["open"] = df["open"].astype(float)
-
         df["datetime"] = pd.to_datetime(
-            df["datetime"]
+            df["datetime"],
+            format="%d-%m-%Y %H:%M:%S"
         )
 
-        # Need 10 previous candles
-        # and 1 future candle for entry
+        df["open"] = pd.to_numeric(df["open"])
+        df["high"] = pd.to_numeric(df["high"])
+        df["low"] = pd.to_numeric(df["low"])
+        df["close"] = pd.to_numeric(df["close"])
 
-        for i in range(10, len(df) - 1):
+        df = (
+            df
+            .sort_values("datetime")
+            .reset_index(drop=True)
+        )
 
-            previous_10 = df.iloc[i-10:i]
+        # Need:
+        # 10 candles history
+        # 1 signal candle
+        # 1 entry candle
+
+        if len(df) < 12:
+            return signals
+
+        for i in range(11, len(df)):
+
+            # --------------------------------
+            # Previous 10 completed candles
+            # --------------------------------
+
+            previous_10 = df.iloc[i - 11:i - 1]
 
             highest_close = (
                 previous_10["close"]
                 .max()
             )
 
-            signal_candle = df.iloc[i]
+            # --------------------------------
+            # Signal Candle
+            # --------------------------------
 
-            signal_close = (
+            signal_candle = df.iloc[i - 1]
+
+            signal_close = float(
                 signal_candle["close"]
             )
 
-            # Rule 3
+            # --------------------------------
+            # Entry Candle
+            # --------------------------------
+
+            entry_candle = df.iloc[i]
+
+            # --------------------------------
+            # Breakout Condition
+            # --------------------------------
 
             if signal_close > highest_close:
 
-                next_candle = df.iloc[i + 1]
-
-                signals.append({
+                signal = {
 
                     "symbol":
                     signal_candle["symbol"],
@@ -50,14 +78,32 @@ class Breakout10Candle(BaseStrategy):
                     "signal_time":
                     signal_candle["datetime"],
 
+                    "signal_close":
+                    signal_close,
+
+                    "highest_close":
+                    highest_close,
+
                     "entry_time":
-                    next_candle["datetime"],
+                    entry_candle["datetime"],
 
                     "entry_price":
-                    next_candle["open"],
+                    float(
+                        entry_candle["open"]
+                    ),
+
+                    "stop_loss":
+                    float(
+                        entry_candle["low"]
+                    ),
+
+                    "quantity":
+                    1,
 
                     "strategy_name":
                     self.STRATEGY_NAME
-                })
+                }
+
+                signals.append(signal)
 
         return signals
