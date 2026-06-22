@@ -94,7 +94,7 @@ class Breakout10Candle(BaseStrategy):
 
                     "stop_loss":
                     float(
-                        entry_candle["low"]
+                        signal_candle["low"]
                     ),
 
                     "quantity":
@@ -105,5 +105,7 @@ class Breakout10Candle(BaseStrategy):
                 }
 
                 signals.append(signal)
+
+                break
 
         return signals

@@ -1,6 +1,9 @@
 from fastapi import APIRouter
 import pandas as pd
 import os
+from app.backtest.exit_engine import (
+    ExitEngine
+)
 
 from app.strategy.breakout_10candle import (
     Breakout10Candle
@@ -42,15 +45,37 @@ def run_strategy():
 
     trades = []
 
+    # for signal in signals:
+
+    #     trade = (
+    #         TradeManager.save_trade(
+    #             signal
+    #         )
+    #     )
+
+    #     trades.append(trade)
+
+
     for signal in signals:
 
+        open_trades = (
+            TradeManager.get_open_trades()
+        )
+
+        if not open_trades.empty:
+            continue
+
         trade = (
-            TradeManager.save_trade(
-                signal
-            )
+            TradeManager.save_trade(signal)
         )
 
         trades.append(trade)
+
+    # RUN EXIT ENGINE
+
+    ExitEngine.process_trades(df)
+
+    
 
     return {
 
