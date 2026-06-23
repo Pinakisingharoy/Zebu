@@ -58,15 +58,16 @@ def run_strategy():
 
     for signal in signals:
 
-        open_trades = (
-            TradeManager.get_open_trades()
-        )
+        # open_trades = (
+        #     TradeManager.get_open_trades()
+        # )
 
-        if not open_trades.empty:
-            continue
+        # if not open_trades.empty:
+        #     continue
 
-        trade = (
-            TradeManager.save_trade(signal)
+
+        trade = TradeManager.save_trade(
+            signal
         )
 
         trades.append(trade)

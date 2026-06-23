@@ -106,6 +106,6 @@ class Breakout10Candle(BaseStrategy):
 
                 signals.append(signal)
 
-                break
+                # break
 
         return signals
