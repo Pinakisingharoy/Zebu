@@ -1,3 +1,4 @@
+
 import pandas as pd
 
 from app.execution.trade_manager import (
@@ -19,12 +20,17 @@ class ExitEngine:
         trades = TradeManager.get_all_trades()
 
         if trades.empty:
+            print("No trades found")
             return
 
         df["datetime"] = pd.to_datetime(
             df["datetime"],
             format="%d-%m-%Y %H:%M:%S"
         )
+
+        df["low"] = pd.to_numeric(df["low"])
+
+        df["close"] = pd.to_numeric(df["close"])
 
         for _, trade in trades.iterrows():
 
@@ -39,7 +45,7 @@ class ExitEngine:
                 trade["entry_price"]
             )
 
-            stop_loss = float(
+            current_sl = float(
                 trade["stop_loss"]
             )
 
@@ -47,157 +53,106 @@ class ExitEngine:
                 trade["quantity"]
             )
 
-            future_candles = df[
-                df["datetime"] > entry_time
-            ]
-
-            # ---------------------
-            # Initial SL
-            # ---------------------
-
-            current_sl = stop_loss
-
-            # Previous candle low
-            previous_low = stop_loss
-
-            # ---------------------
-            # Process future candles
-            # ---------------------
-
-            # for _, candle in future_candles.iterrows():
-
-            #     candle_low = float(
-            #         candle["low"]
-            #     )
-
-            #     candle_close = float(
-            #         candle["close"]
-            #     )
-
-            #     # ---------------------
-            #     # Update Trailing SL
-            #     # Using PREVIOUS candle low
-            #     # ---------------------
-
-            #     new_sl = (
-            #         TrailingSL.update_sl(
-            #             current_sl,
-            #             previous_low
-            #         )
-            #     )
-            #     print(
-            #         f"Trade: {trade['trade_id']}"
-            #     )
-
-            #     print(
-            #         f"Entry Time: {entry_time}"
-            #     )
-
-            #     print(
-            #         f"Future Candles: {len(future_candles)}"
-            #     )
-
-
-            #     if new_sl > current_sl:
-
-            #         current_sl = new_sl
-
-            #         TradeManager.update_stop_loss(
-            #             trade["trade_id"],
-            #             current_sl
-            #         )
-
-            #     # ---------------------
-            #     # Exit Condition
-            #     # ---------------------
-
-            #     if (
-            #         candle_low <= current_sl
-            #         # or
-            #         # candle_close <= current_sl
-            #     ):
-
-            #         exit_price = current_sl
-
-            #         gross_pnl = (
-            #             (
-            #                 exit_price
-            #                 - entry_price
-            #             )
-            #             * quantity
-            #         )
-
-            #         net_pnl = (
-            #             gross_pnl
-            #             - ExitEngine.BROKERAGE
-            #         )
-
-            #         TradeManager.close_trade(
-            #             trade["trade_id"],
-            #             candle["datetime"],
-            #             exit_price,
-            #             gross_pnl,
-            #             net_pnl,
-            #             "TRAILING_SL_HIT"
-            #         )
-
-            #         print(
-            #             f"Trade Closed -> "
-            #             f"{trade['trade_id']}"
-            #         )
-
-            #         break
-
-
-
-        for _, candle in future_candles.iterrows():
-
-            candle_low = float(
-                candle["low"]
+            future_candles = (
+                df[
+                    df["datetime"] > entry_time
+                ]
+                .copy()
+                .reset_index(drop=True)
             )
 
-            new_sl = TrailingSL.update_sl(
-                current_sl,
-                previous_low
+            if len(future_candles) < 2:
+                continue
+
+            print("\n" + "=" * 50)
+            print(
+                f"Trade ID : {trade['trade_id']}"
             )
-
-            current_sl = new_sl
-
-            TradeManager.update_stop_loss(
-                trade["trade_id"],
-                current_sl
+            print(
+                f"Entry Price : {entry_price}"
             )
+            print(
+                f"Initial SL : {current_sl}"
+            )
+            print("=" * 50)
 
-            if candle_low <= current_sl:
+            for i in range(
+                1,
+                len(future_candles)
+            ):
 
-                exit_price = current_sl
-
-                gross_pnl = (
-                    exit_price -
-                    entry_price
-                ) * quantity
-
-                net_pnl = (
-                    gross_pnl -
-                    ExitEngine.BROKERAGE
+                previous_candle = (
+                    future_candles.iloc[i - 1]
                 )
 
-                TradeManager.close_trade(
-                    trade["trade_id"],
-                    candle["datetime"],
-                    exit_price,
-                    gross_pnl,
-                    net_pnl,
-                    "TRAILING_SL_HIT"
+                current_candle = (
+                    future_candles.iloc[i]
                 )
 
-                break
+                previous_low = float(
+                    previous_candle["low"]
+                )
 
+                # Trailing SL
+                new_sl = (
+                    TrailingSL.update_sl(
+                        current_sl,
+                        previous_low
+                    )
+                )
 
+                if new_sl > current_sl:
 
-                # ---------------------
-                # Save current candle low
-                # for next candle trail
-                # ---------------------
+                    current_sl = new_sl
 
-            previous_low = candle_low
+                    TradeManager.update_stop_loss(
+                        trade["trade_id"],
+                        current_sl
+                    )
+
+                    print(
+                        f"SL Updated -> {current_sl}"
+                    )
+
+                current_low = float(
+                    current_candle["low"]
+                )
+
+                current_close = float(
+                    current_candle["close"]
+                )
+
+                # Exit Logic
+                if (
+                    current_low <= current_sl
+                    or
+                    current_close <= current_sl
+                ):
+
+                    exit_price = current_sl
+
+                    gross_pnl = (
+                        exit_price -
+                        entry_price
+                    ) * quantity
+
+                    net_pnl = (
+                        gross_pnl -
+                        ExitEngine.BROKERAGE
+                    )
+
+                    TradeManager.close_trade(
+                        trade["trade_id"],
+                        current_candle["datetime"],
+                        exit_price,
+                        gross_pnl,
+                        net_pnl,
+                        "TRAILING_SL_HIT"
+                    )
+
+                    print(
+                        f"Trade Closed -> "
+                        f"{trade['trade_id']}"
+                    )
+
+                    break

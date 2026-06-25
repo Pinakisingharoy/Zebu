@@ -119,6 +119,10 @@ class TradeManager:
             cls.FILE_PATH,
             index=False
         )
+        print(
+        f"SL Updated "
+        f"{trade_id} -> {new_sl}"
+)
 
     @classmethod
     def get_all_trades(cls):

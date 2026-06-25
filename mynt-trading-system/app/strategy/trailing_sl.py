@@ -1,12 +1,27 @@
+# class TrailingSL:
+
+#     @staticmethod
+#     def update_sl(
+#         current_sl,
+#         previous_candle_low
+#     ):
+
+#         return max(
+#             current_sl,
+#             previous_candle_low
+#         )
+
 class TrailingSL:
+
 
     @staticmethod
     def update_sl(
         current_sl,
-        previous_low
+        previous_candle_low
     ):
 
-        if previous_low > current_sl:
-            return previous_low
+        return max(
+            current_sl,
+            previous_candle_low
+        )
 
-        return current_sl

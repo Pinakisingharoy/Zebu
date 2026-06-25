@@ -5,6 +5,8 @@ from app.backtest.exit_engine import (
     ExitEngine
 )
 
+
+
 from app.strategy.breakout_10candle import (
     Breakout10Candle
 )
@@ -78,6 +80,23 @@ def run_strategy():
 
     
 
+    # return {
+
+    #     "success": True,
+
+    #     "signals_found":
+    #     len(signals),
+
+    #     "trades_created":
+    #     len(trades),
+
+    #     "trades":
+    #     trades
+    # }
+    updated_trades = (
+    TradeManager.get_all_trades()
+)
+
     return {
 
         "success": True,
@@ -86,8 +105,10 @@ def run_strategy():
         len(signals),
 
         "trades_created":
-        len(trades),
+        len(updated_trades),
 
         "trades":
-        trades
+        updated_trades.to_dict(
+            orient="records"
+        )
     }
