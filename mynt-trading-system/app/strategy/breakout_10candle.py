@@ -1,6 +1,9 @@
+
 # import pandas as pd
 
-# from app.strategy.base_strategy import BaseStrategy
+# from app.strategy.base_strategy import (
+#     BaseStrategy
+# )
 
 
 # class Breakout10Candle(BaseStrategy):
@@ -27,254 +30,228 @@
 #             .reset_index(drop=True)
 #         )
 
-#         # Need:
-#         # 10 candles history
-#         # 1 signal candle
-#         # 1 entry candle
+#         # -------------------------
+#         # Create Trading Date
+#         # -------------------------
 
-#         if len(df) < 12:
-#             return signals
+#         df["trade_date"] = (
+#             df["datetime"]
+#             .dt.date
+#         )
 
-#         for i in range(11, len(df)):
+#         # -------------------------
+#         # Process Day Wise
+#         # -------------------------
 
-#             # --------------------------------
-#             # Previous 10 completed candles
-#             # --------------------------------
+#         for trade_date, day_df in df.groupby(
+#             "trade_date"
+#         ):
 
-#             previous_10 = df.iloc[i - 11:i - 1]
-
-#             highest_close = (
-#                 previous_10["close"]
-#                 .max()
+#             day_df = (
+#                 day_df
+#                 .sort_values("datetime")
+#                 .reset_index(drop=True)
 #             )
 
-#             # --------------------------------
-#             # Signal Candle
-#             # --------------------------------
+#             # Need:
+#             # 10 candles history
+#             # 1 signal candle
+#             # 1 entry candle
 
-#             signal_candle = df.iloc[i - 1]
+#             if len(day_df) < 12:
+#                 continue
 
-#             signal_close = float(
-#                 signal_candle["close"]
-#             )
+#             # -------------------------
+#             # Start from 11th index
+#             # First possible signal:
+#             # 09:25
+#             # First entry:
+#             # 09:26
+#             # -------------------------
 
-#             # --------------------------------
-#             # Entry Candle
-#             # --------------------------------
+#             for i in range(
+#                 11,
+#                 len(day_df)
+#             ):
 
-#             entry_candle = df.iloc[i]
+#                 # -------------------------
+#                 # Previous 10 completed candles
+#                 # -------------------------
 
-#             # --------------------------------
-#             # Breakout Condition
-#             # --------------------------------
+#                 previous_10 = day_df.iloc[
+#                     i - 11:i - 1
+#                 ]
 
-#             if signal_close > highest_close:
+#                 highest_close = (
+#                     previous_10["close"]
+#                     .max()
+#                 )
 
-#                 signal = {
+#                 # -------------------------
+#                 # Signal Candle
+#                 # -------------------------
 
-#                     "symbol":
-#                     signal_candle["symbol"],
+#                 signal_candle = (
+#                     day_df.iloc[i - 1]
+#                 )
 
-#                     "signal_time":
-#                     signal_candle["datetime"],
+#                 signal_close = float(
+#                     signal_candle["close"]
+#                 )
 
-#                     "signal_close":
-#                     signal_close,
+#                 signal_time = (
+#                     signal_candle["datetime"]
+#                     .time()
+#                 )
 
-#                     "highest_close":
-#                     highest_close,
+#                 # -------------------------
+#                 # No signal before 09:25
+#                 # -------------------------
 
-#                     "entry_time":
-#                     entry_candle["datetime"],
+#                 if signal_time < pd.to_datetime(
+#                     "09:25:00"
+#                 ).time():
+#                     continue
 
-#                     "entry_price":
-#                     float(
-#                         entry_candle["open"]
-#                     ),
+#                 # -------------------------
+#                 # Entry Candle
+#                 # -------------------------
 
-#                     "stop_loss":
-#                     float(
-#                         signal_candle["low"]
-#                     ),
+#                 entry_candle = (
+#                     day_df.iloc[i]
+#                 )
 
-#                     "quantity":
-#                     1,
+#                 # -------------------------
+#                 # Breakout Condition
+#                 # -------------------------
 
-#                     "strategy_name":
-#                     self.STRATEGY_NAME
-#                 }
+#                 if signal_close > highest_close:
 
-#                 signals.append(signal)
+#                     signal = {
 
-#                 # break
+#                         "symbol":
+#                         signal_candle["symbol"],
+
+#                         "signal_time":
+#                         signal_candle["datetime"],
+
+#                         "signal_close":
+#                         signal_close,
+
+#                         "highest_close":
+#                         highest_close,
+
+#                         "entry_time":
+#                         entry_candle["datetime"],
+
+#                         "entry_price":
+#                         float(
+#                             entry_candle["open"]
+#                         ),
+
+#                         # Previous Candle Low
+#                         "stop_loss":
+#                         float(
+#                             signal_candle["low"]
+#                         ),
+
+#                         "quantity":
+#                         1,
+
+#                         "strategy_name":
+#                         self.STRATEGY_NAME
+#                     }
+
+#                     signals.append(signal)
 
 #         return signals
 
 
 
+
 import pandas as pd
-
-from app.strategy.base_strategy import (
-    BaseStrategy
-)
-
+from app.strategy.base_strategy import BaseStrategy
 
 class Breakout10Candle(BaseStrategy):
-
+    
     STRATEGY_NAME = "10_CANDLE_BREAKOUT"
-
+    
     def generate_signals(self, df):
-
+        
         signals = []
-
-        df["datetime"] = pd.to_datetime(
-            df["datetime"],
-            format="%d-%m-%Y %H:%M:%S"
-        )
-
-        df["open"] = pd.to_numeric(df["open"])
-        df["high"] = pd.to_numeric(df["high"])
-        df["low"] = pd.to_numeric(df["low"])
-        df["close"] = pd.to_numeric(df["close"])
-
-        df = (
-            df
-            .sort_values("datetime")
-            .reset_index(drop=True)
-        )
-
-        # -------------------------
-        # Create Trading Date
-        # -------------------------
-
-        df["trade_date"] = (
-            df["datetime"]
-            .dt.date
-        )
-
-        # -------------------------
-        # Process Day Wise
-        # -------------------------
-
-        for trade_date, day_df in df.groupby(
-            "trade_date"
-        ):
-
-            day_df = (
-                day_df
-                .sort_values("datetime")
-                .reset_index(drop=True)
+        
+        try:
+            # Parse datetime
+            df["datetime"] = pd.to_datetime(
+                df["datetime"],
+                format="%d-%m-%Y %H:%M:%S"
             )
-
-            # Need:
-            # 10 candles history
-            # 1 signal candle
-            # 1 entry candle
-
-            if len(day_df) < 12:
-                continue
-
-            # -------------------------
-            # Start from 11th index
-            # First possible signal:
-            # 09:25
-            # First entry:
-            # 09:26
-            # -------------------------
-
-            for i in range(
-                11,
-                len(day_df)
-            ):
-
-                # -------------------------
-                # Previous 10 completed candles
-                # -------------------------
-
-                previous_10 = day_df.iloc[
-                    i - 11:i - 1
-                ]
-
-                highest_close = (
-                    previous_10["close"]
-                    .max()
-                )
-
-                # -------------------------
-                # Signal Candle
-                # -------------------------
-
-                signal_candle = (
-                    day_df.iloc[i - 1]
-                )
-
-                signal_close = float(
-                    signal_candle["close"]
-                )
-
-                signal_time = (
-                    signal_candle["datetime"]
-                    .time()
-                )
-
-                # -------------------------
-                # No signal before 09:25
-                # -------------------------
-
-                if signal_time < pd.to_datetime(
-                    "09:25:00"
-                ).time():
+            
+            # Convert to numeric
+            df["open"] = pd.to_numeric(df["open"], errors='coerce')
+            df["high"] = pd.to_numeric(df["high"], errors='coerce')
+            df["low"] = pd.to_numeric(df["low"], errors='coerce')
+            df["close"] = pd.to_numeric(df["close"], errors='coerce')
+            
+            # Drop any rows with NaN values
+            df = df.dropna(subset=['open', 'high', 'low', 'close'])
+            
+            df = df.sort_values("datetime").reset_index(drop=True)
+            
+            # Create trading date
+            df["trade_date"] = df["datetime"].dt.date
+            
+            # Process day by day
+            for trade_date, day_df in df.groupby("trade_date"):
+                
+                day_df = day_df.sort_values("datetime").reset_index(drop=True)
+                
+                # Need at least 12 candles: 10 history + 1 signal + 1 entry
+                if len(day_df) < 12:
                     continue
-
-                # -------------------------
-                # Entry Candle
-                # -------------------------
-
-                entry_candle = (
-                    day_df.iloc[i]
-                )
-
-                # -------------------------
-                # Breakout Condition
-                # -------------------------
-
-                if signal_close > highest_close:
-
-                    signal = {
-
-                        "symbol":
-                        signal_candle["symbol"],
-
-                        "signal_time":
-                        signal_candle["datetime"],
-
-                        "signal_close":
-                        signal_close,
-
-                        "highest_close":
-                        highest_close,
-
-                        "entry_time":
-                        entry_candle["datetime"],
-
-                        "entry_price":
-                        float(
-                            entry_candle["open"]
-                        ),
-
-                        # Previous Candle Low
-                        "stop_loss":
-                        float(
-                            signal_candle["low"]
-                        ),
-
-                        "quantity":
-                        1,
-
-                        "strategy_name":
-                        self.STRATEGY_NAME
-                    }
-
-                    signals.append(signal)
-
-        return signals
+                
+                # Start from 11th index (0-based)
+                for i in range(11, len(day_df) - 1):
+                    
+                    # Previous 10 completed candles (before signal candle)
+                    previous_10 = day_df.iloc[i - 11:i - 1]
+                    
+                    highest_close = previous_10["close"].max()
+                    
+                    # Signal candle (candle that triggers the signal)
+                    signal_candle = day_df.iloc[i - 1]
+                    signal_close = float(signal_candle["close"])
+                    signal_time = signal_candle["datetime"].time()
+                    
+                    # Only trade after 9:25 AM
+                    if signal_time < pd.to_datetime("09:25:00").time():
+                        continue
+                    
+                    # Entry candle (next candle after signal)
+                    entry_candle = day_df.iloc[i]
+                    
+                    # Breakout condition: Signal close > Highest close of previous 10
+                    if signal_close > highest_close:
+                        
+                        signal = {
+                            "symbol": signal_candle.get("symbol", "NIFTY"),
+                            "signal_time": signal_candle["datetime"],
+                            "signal_close": signal_close,
+                            "highest_close": highest_close,
+                            "entry_time": entry_candle["datetime"],
+                            "entry_price": float(entry_candle["open"]),
+                            "stop_loss": float(signal_candle["low"]),
+                            "quantity": 1,
+                            "strategy_name": self.STRATEGY_NAME
+                        }
+                        
+                        signals.append(signal)
+                        print(f"Signal generated at {signal_candle['datetime']}: {signal_close} > {highest_close}")
+            
+            return signals
+            
+        except Exception as e:
+            print(f"Error in generate_signals: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
