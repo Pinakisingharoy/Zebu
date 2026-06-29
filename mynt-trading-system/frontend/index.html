@@ -1,0 +1,2012 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading System Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        /* Login Page */
+        #loginPage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        #loginPage.hidden {
+            display: none;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .logo-icon {
+            font-size: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 50%;
+            color: white;
+            display: inline-block;
+        }
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 15px;
+        }
+        .login-header .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+        #loginStatus {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            min-height: 24px;
+        }
+        #loginStatus.success { color: #28a745; }
+        #loginStatus.error { color: #dc3545; }
+        #loginStatus.info { color: #17a2b8; }
+        .login-footer {
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            padding-top: 20px;
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        /* Dashboard */
+        #dashboardPage {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #dashboardPage.active {
+            display: block;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .session-timer {
+            font-size: 14px;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        .btn-logout {
+            padding: 8px 18px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .welcome-banner h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .welcome-banner p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .welcome-date {
+            text-align: right;
+            font-size: 14px;
+        }
+        .welcome-date p {
+            margin: 3px 0;
+        }
+
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .status-card .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .status-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .status-card .label {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .stat-card .icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .stat-card .icon.blue { color: #4facfe; }
+        .stat-card .icon.green { color: #43e97b; }
+        .stat-card .icon.yellow { color: #f5576c; }
+        .stat-card .icon.purple { color: #a18cd1; }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .action-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .action-btn.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .action-btn.success { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .action-btn.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .action-btn.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        /* Trades Container */
+        .trades-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-top: 20px;
+            display: none;
+        }
+        .trades-container.show {
+            display: block;
+        }
+        .trades-container h3 {
+            margin-bottom: 15px;
+            color: #1a1a2e;
+        }
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .trades-table th {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .trades-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .trades-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Loading */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        #loadingOverlay.show {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #loadingOverlay p {
+            color: white;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            max-width: 400px;
+            font-size: 14px;
+            color: white;
+            animation: slideIn 0.3s ease-out;
+        }
+        .toast-success { background: #28a745; }
+        .toast-error { background: #dc3545; }
+        .toast-info { background: #17a2b8; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .login-card { padding: 30px 20px; }
+            .welcome-banner { flex-direction: column; text-align: center; }
+            .welcome-date { text-align: center; }
+            .navbar { flex-direction: column; text-align: center; }
+            .status-grid { grid-template-columns: 1fr 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .action-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .status-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .action-grid { grid-template-columns: 1fr; }
+            .nav-right { flex-direction: column; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>Trading System</h1>
+                <p class="subtitle">Mynt/Zebu Integration</p>
+            </div>
+            
+            <div>
+                <button id="loginButton" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login with Mynt/Zebu
+                </button>
+                <div id="loginStatus"></div>
+            </div>
+            
+            <div class="login-footer">
+                <p>Secure authentication via Mynt/Zebu OAuth</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-chart-line"></i>
+                Trading System
+            </div>
+            <div class="nav-right">
+                <span class="session-timer">
+                    <i class="fas fa-clock"></i> Session: <span id="sessionTime">--:--</span>
+                </span>
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div>
+                <h2>Welcome, <span id="userFullName">User</span>!</h2>
+                <p><i class="fas fa-user-circle"></i> <span id="userUsername">--</span></p>
+            </div>
+            <div class="welcome-date">
+                <p><i class="fas fa-calendar-day"></i> <span id="currentDate">--</span></p>
+                <p><i class="fas fa-clock"></i> <span id="currentTime">--</span></p>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="icon" style="color:#4facfe"><i class="fas fa-user"></i></div>
+                <div class="value" id="userStatusValue">Active</div>
+                <div class="label">Logged-in User</div>
+                <span class="badge badge-success" id="userStatusBadge">Active</span>
+            </div>
+            <div class="status-card">
+                <div class="icon" style="color:#43e97b"><i class="fas fa-id-card"></i></div>
+                <div class="value" id="accountStatusValue">Active</div>
+                <div class="label">Account Status</div>
+                <span class="badge badge-success" id="accountStatusBadge">Active</span>
+            </div>
+            <div class="status-card">
+                <div class="icon" style="color:#f5576c"><i class="fas fa-wallet"></i></div>
+                <div class="value" id="balanceValue">₹0.00</div>
+                <div class="label">Available Balance</div>
+                <span class="badge badge-info">Updated</span>
+            </div>
+            <div class="status-card">
+                <div class="icon" style="color:#a18cd1"><i class="fas fa-chart-simple"></i></div>
+                <div class="value" id="marketStatusValue">--</div>
+                <div class="label">Market Status</div>
+                <span class="badge" id="marketStatusBadge">--</span>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon blue"><i class="fas fa-chart-bar"></i></div>
+                <div class="number" id="totalTrades">0</div>
+                <div class="label">Total Trades</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon green"><i class="fas fa-dollar-sign"></i></div>
+                <div class="number" id="netPnl">₹0.00</div>
+                <div class="label">Net P&L</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon yellow"><i class="fas fa-clock"></i></div>
+                <div class="number" id="openTrades">0</div>
+                <div class="label">Open Trades</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon purple"><i class="fas fa-trophy"></i></div>
+                <div class="number" id="winRate">0%</div>
+                <div class="label">Win Rate</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="action-grid">
+            <button class="action-btn primary" onclick="downloadData()">
+                <i class="fas fa-download"></i> Download Data
+            </button>
+            <button class="action-btn success" onclick="runStrategy()">
+                <i class="fas fa-play"></i> Run Strategy
+            </button>
+            <button class="action-btn warning" onclick="runBacktest()">
+                <i class="fas fa-flask"></i> Start Backtest
+            </button>
+            <button class="action-btn info" onclick="viewTrades()">
+                <i class="fas fa-list"></i> View Trades
+            </button>
+        </div>
+
+        <!-- Trades Container -->
+        <div id="tradesContainer" class="trades-container">
+            <h3><i class="fas fa-list"></i> All Trades</h3>
+            <div id="tradesTable"></div>
+        </div>
+    </div>
+
+        <script>
+        // ========================================
+        // CONFIGURATION
+        // ========================================
+        const API_BASE = 'http://localhost:8000';
+        let token = null;
+        let user = null;
+        let sessionExpiry = null;
+        let sessionTimer = null;
+
+        // ========================================
+        // DOM HELPERS
+        // ========================================
+        function $(id) { return document.getElementById(id); }
+
+        function showLoading() {
+            const overlay = $('loadingOverlay');
+            if (overlay) overlay.classList.add('show');
+        }
+
+        function hideLoading() {
+            const overlay = $('loadingOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function showLoginStatus(type, message) {
+            const status = $('loginStatus');
+            status.className = type;
+            status.textContent = message;
+        }
+
+        function showToast(message, type = 'info') {
+            // Ensure message is a string
+            let msg = message;
+            if (typeof message === 'object') {
+                msg = JSON.stringify(message);
+            }
+            if (!msg || msg === 'undefined' || msg === 'null') {
+                msg = 'Operation completed';
+            }
+            
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function formatCurrency(amount) {
+            if (amount === null || amount === undefined || isNaN(amount)) return '₹0.00';
+            return '₹' + Number(amount).toFixed(2);
+        }
+
+        function formatDate(date) {
+            if (!date) return '--';
+            try {
+                return new Date(date).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            } catch(e) { return date; }
+        }
+
+        function getTimeRemaining(expiry) {
+            const diff = expiry - Date.now();
+            if (diff <= 0) return 'Expired';
+            const m = Math.floor(diff / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // ========================================
+        // API FUNCTIONS
+        // ========================================
+        async function apiRequest(endpoint, options = {}) {
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    handleSessionExpired();
+                    throw new Error('Session expired');
+                }
+                if (!response.ok) {
+                    const errorMsg = data.message || data.detail || 'Request failed';
+                    throw new Error(errorMsg);
+                }
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // ========================================
+        // AUTHENTICATION
+        // ========================================
+        function handleLogin() {
+            window.location.href = `${API_BASE}/auth/login`;
+        }
+
+        function handleRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const token_param = params.get('token');
+            const username = params.get('username');
+            const full_name = params.get('full_name');
+            
+            if (token_param) {
+                console.log('Received token from redirect');
+                
+                user = {
+                    username: username || 'User',
+                    full_name: full_name || username || 'User',
+                    status: 'Active'
+                };
+                
+                token = token_param;
+                
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                sessionExpiry = Date.now() + (30 * 60 * 1000);
+                localStorage.setItem('sessionExpiry', sessionExpiry.toString());
+                
+                showToast(`Welcome ${user.full_name}!`, 'success');
+                
+                loadDashboard().then(() => {
+                    $('loginPage').classList.add('hidden');
+                    $('dashboardPage').classList.add('active');
+                    startSessionTimer();
+                    updateTimeDisplay();
+                });
+                
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return true;
+            }
+            return false;
+        }
+
+        function handleSessionExpired() {
+            token = null;
+            user = null;
+            sessionExpiry = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('sessionExpiry');
+            if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+            $('loginPage').classList.remove('hidden');
+            $('dashboardPage').classList.remove('active');
+            showLoginStatus('error', 'Session expired. Please login again.');
+            showToast('Session expired', 'error');
+        }
+
+        function startSessionTimer() {
+            if (sessionTimer) clearInterval(sessionTimer);
+            sessionTimer = setInterval(() => {
+                if (sessionExpiry) {
+                    const remaining = getTimeRemaining(sessionExpiry);
+                    $('sessionTime').textContent = remaining;
+                    if (remaining === 'Expired') handleSessionExpired();
+                }
+                updateTimeDisplay();
+            }, 1000);
+        }
+
+        function updateTimeDisplay() {
+            const now = new Date();
+            const dateDisplay = $('currentDate');
+            const timeDisplay = $('currentTime');
+            
+            if (dateDisplay) {
+                dateDisplay.textContent = now.toLocaleDateString('en-IN', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+            if (timeDisplay) {
+                timeDisplay.textContent = now.toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+            }
+        }
+
+        function handleLogout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+            showLoading();
+            fetch(`${API_BASE}/auth/logout`, { method: 'POST' })
+                .finally(() => {
+                    token = null;
+                    user = null;
+                    sessionExpiry = null;
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('sessionExpiry');
+                    if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+                    $('loginPage').classList.remove('hidden');
+                    $('dashboardPage').classList.remove('active');
+                    hideLoading();
+                    showToast('Logged out successfully', 'success');
+                });
+        }
+
+        // ========================================
+        // DASHBOARD
+        // ========================================
+        async function loadDashboard() {
+            try {
+                showLoading();
+                
+                $('userFullName').textContent = user?.full_name || 'User';
+                $('userUsername').textContent = user?.username || '--';
+                $('userStatusValue').textContent = user?.status || 'Active';
+                $('userStatusBadge').textContent = user?.status || 'Active';
+                $('userStatusBadge').className = `badge badge-${user?.status === 'Active' ? 'success' : 'danger'}`;
+                
+                const data = await apiRequest('/api/dashboard/dashboard-data');
+                console.log('Dashboard data:', data);
+                
+                $('accountStatusValue').textContent = data.account?.status || 'Active';
+                $('accountStatusBadge').textContent = data.account?.status || 'Active';
+                $('accountStatusBadge').className = `badge badge-${data.account?.status === 'Active' ? 'success' : 'danger'}`;
+                
+                $('balanceValue').textContent = formatCurrency(data.account?.balance || 0);
+                
+                $('marketStatusValue').textContent = data.market?.status || 'Closed';
+                $('marketStatusBadge').textContent = data.market?.status || 'Closed';
+                $('marketStatusBadge').className = `badge badge-${data.market?.status === 'Open' ? 'success' : 'danger'}`;
+                
+                $('totalTrades').textContent = data.statistics?.total_trades || 0;
+                
+                const pnl = data.statistics?.net_pnl || 0;
+                $('netPnl').textContent = formatCurrency(pnl);
+                $('netPnl').style.color = pnl >= 0 ? '#28a745' : '#dc3545';
+                
+                $('openTrades').textContent = data.statistics?.open_trades || 0;
+                $('winRate').textContent = `${data.statistics?.win_rate || 0}%`;
+                
+                if (!sessionExpiry) {
+                    sessionExpiry = Date.now() + (30 * 60 * 1000);
+                }
+                
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                if (error.message === 'Session expired') {
+                    handleSessionExpired();
+                } else {
+                    showToast('Failed to load dashboard: ' + (error.message || 'Unknown error'), 'error');
+                }
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ========================================
+        // QUICK ACTIONS
+        // ========================================
+        async function downloadData() {
+            showLoading();
+            try {
+                const data = await apiRequest('/historical/download');
+                if (data.success) {
+                    showToast(data.message || 'Data downloaded successfully!', 'success');
+                    await loadDashboard();
+                } else {
+                    showToast(data.message || 'Download failed', 'error');
+                }
+            } catch (error) {
+                showToast('Download failed: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function runStrategy() {
+            showLoading();
+            try {
+                const data = await apiRequest('/strategy/run', { method: 'POST' });
+                if (data.success) {
+                    showToast(data.message || `Strategy completed!`, 'success');
+                    await loadDashboard();
+                } else {
+                    showToast(data.message || 'Strategy failed', 'error');
+                }
+            } catch (error) {
+                showToast('Strategy failed: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function runBacktest() {
+            showLoading();
+            try {
+                const data = await apiRequest('/strategy/backtest', { method: 'POST' });
+                if (data.success) {
+                    showToast('Backtest completed successfully!', 'success');
+                    await loadDashboard();
+                    if (data.trades && data.trades.length > 0) {
+                        showTrades(data.trades);
+                    }
+                    if (data.summary) {
+                        const summary = data.summary;
+                        let msg = `Net Profit: ${formatCurrency(summary.net_profit || 0)}`;
+                        msg += ` | Win Rate: ${summary.win_rate || 0}%`;
+                        msg += ` | Total Trades: ${summary.total_trades || 0}`;
+                        showToast(msg, 'info');
+                    }
+                } else {
+                    showToast(data.message || 'Backtest failed', 'error');
+                }
+            } catch (error) {
+                showToast('Backtest failed: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function viewTrades() {
+            showLoading();
+            try {
+                const data = await apiRequest('/api/dashboard/trades');
+                if (data.trades && data.trades.length > 0) {
+                    showTrades(data.trades);
+                    showToast(`Loaded ${data.trades.length} trades`, 'success');
+                } else {
+                    showToast('No trades found', 'info');
+                }
+            } catch (error) {
+                showToast('Failed to load trades: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showTrades(trades) {
+            const container = $('tradesContainer');
+            const table = $('tradesTable');
+            
+            if (!container || !table) return;
+            
+            container.classList.add('show');
+            
+            if (!trades || trades.length === 0) {
+                table.innerHTML = '<p style="text-align:center;color:#6c757d;padding:20px;">No trades found</p>';
+                return;
+            }
+            
+            let html = `<table class="trades-table"><thead><tr>
+                <th>ID</th><th>Symbol</th><th>Entry Time</th><th>Entry Price</th>
+                <th>Exit Price</th><th>P&L</th><th>Status</th>
+            </tr></thead><tbody>`;
+            
+            trades.slice(0, 50).forEach(t => {
+                const pnl = t.net_pnl || 0;
+                const color = pnl >= 0 ? '#28a745' : '#dc3545';
+                html += `<tr>
+                    <td><small>${(t.trade_id || '').substring(0, 8)}</small></td>
+                    <td>${t.symbol || 'NIFTY'}</td>
+                    <td>${formatDate(t.entry_time)}</td>
+                    <td>${formatCurrency(t.entry_price)}</td>
+                    <td>${t.exit_price ? formatCurrency(t.exit_price) : '-'}</td>
+                    <td style="color:${color};font-weight:600;">${formatCurrency(pnl)}</td>
+                    <td style="color:${t.trade_status === 'OPEN' ? '#28a745' : '#6c757d'};">${t.trade_status || 'OPEN'}</td>
+                </tr>`;
+            });
+            
+            html += `</tbody></table>`;
+            if (trades.length > 50) {
+                html += `<p style="margin-top:12px;color:#6c757d;font-size:13px;">Showing 50 of ${trades.length} trades</p>`;
+            }
+            table.innerHTML = html;
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initializing...');
+            
+            const loginBtn = $('loginButton');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', handleLogin);
+            }
+            
+            if (handleRedirect()) {
+                return;
+            }
+            
+            const savedToken = localStorage.getItem('token');
+            const savedUser = localStorage.getItem('user');
+            const savedExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (savedToken && savedUser && savedExpiry) {
+                const expiry = parseInt(savedExpiry);
+                if (expiry > Date.now()) {
+                    token = savedToken;
+                    user = JSON.parse(savedUser);
+                    sessionExpiry = expiry;
+                    console.log('Restoring session for user:', user);
+                    $('loginPage').classList.add('hidden');
+                    $('dashboardPage').classList.add('active');
+                    loadDashboard().then(() => {
+                        startSessionTimer();
+                        showToast('Welcome back!', 'info');
+                    });
+                    return;
+                }
+            }
+            
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('sessionExpiry');
+            $('loginPage').classList.remove('hidden');
+            $('dashboardPage').classList.remove('active');
+            console.log('Showing login page');
+        });
+
+        // Make functions globally accessible
+        window.downloadData = downloadData;
+        window.runStrategy = runStrategy;
+        window.runBacktest = runBacktest;
+        window.viewTrades = viewTrades;
+        window.handleLogout = handleLogout;
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading System Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        /* Login Page */
+        #loginPage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        #loginPage.hidden {
+            display: none;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .logo-icon {
+            font-size: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 50%;
+            color: white;
+            display: inline-block;
+        }
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 15px;
+        }
+        .login-header .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+        #loginStatus {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            min-height: 24px;
+        }
+        #loginStatus.success { color: #28a745; }
+        #loginStatus.error { color: #dc3545; }
+        #loginStatus.info { color: #17a2b8; }
+        .login-footer {
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            padding-top: 20px;
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        /* Dashboard */
+        #dashboardPage {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        #dashboardPage.active {
+            display: block;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .session-timer {
+            font-size: 14px;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        .btn-logout {
+            padding: 8px 18px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .welcome-banner h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .welcome-banner p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .welcome-date {
+            text-align: right;
+            font-size: 14px;
+        }
+        .welcome-date p {
+            margin: 3px 0;
+        }
+
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .status-card .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .status-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .status-card .label {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .stat-card .icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .stat-card .icon.blue { color: #4facfe; }
+        .stat-card .icon.green { color: #43e97b; }
+        .stat-card .icon.yellow { color: #f5576c; }
+        .stat-card .icon.purple { color: #a18cd1; }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .action-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .action-btn.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .action-btn.success { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .action-btn.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .action-btn.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        /* Trades Container */
+        .trades-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-top: 20px;
+            display: none;
+        }
+        .trades-container.show {
+            display: block;
+        }
+        .trades-container h3 {
+            margin-bottom: 15px;
+            color: #1a1a2e;
+        }
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .trades-table th {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .trades-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .trades-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Loading */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        #loadingOverlay.show {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #loadingOverlay p {
+            color: white;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            max-width: 400px;
+            font-size: 14px;
+            color: white;
+            animation: slideIn 0.3s ease-out;
+        }
+        .toast-success { background: #28a745; }
+        .toast-error { background: #dc3545; }
+        .toast-info { background: #17a2b8; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .login-card { padding: 30px 20px; }
+            .welcome-banner { flex-direction: column; text-align: center; }
+            .welcome-date { text-align: center; }
+            .navbar { flex-direction: column; text-align: center; }
+            .status-grid { grid-template-columns: 1fr 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .action-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .status-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .action-grid { grid-template-columns: 1fr; }
+            .nav-right { flex-direction: column; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>Trading System</h1>
+                <p class="subtitle">Mynt/Zebu Integration</p>
+            </div>
+            
+            <div>
+                <button id="loginButton" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login with Mynt/Zebu
+                </button>
+                <div id="loginStatus"></div>
+            </div>
+            
+            <div class="login-footer">
+                <p>Secure authentication via Mynt/Zebu OAuth</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-chart-line"></i>
+                Trading System
+            </div>
+            <div class="nav-right">
+                <span class="session-timer">
+                    <i class="fas fa-clock"></i> Session: <span id="sessionTime">--:--</span>
+                </span>
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div>
+                <h2>Welcome, <span id="userFullName">User</span>!</h2>
+                <p><i class="fas fa-user-circle"></i> <span id="userUsername">--</span></p>
+            </div>
+            <div class="welcome-date">
+                <p><i class="fas fa-calendar-day"></i> <span id="currentDate">--</span></p>
+                <p><i class="fas fa-clock"></i> <span id="currentTime">--</span></p>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="icon" style="color:#4facfe"><i class="fas fa-user"></i></div>
+                <div class="value" id="userStatusValue">Active</div>
+                <div class="label">Logged-in User</div>
+                <span class="badge badge-success" id="userStatusBadge">Active</span>
+            </div>
+            <div class="status-card">
+                <div class="icon" style="color:#43e97b"><i class="fas fa-id-card"></i></div>
+                <div class="value" id="accountStatusValue">Active</div>
+                <div class="label">Account Status</div>
+                <span class="badge badge-success" id="accountStatusBadge">Active</span>
+            </div>
+            <div class="status-card">
+                <div class="icon" style="color:#f5576c"><i class="fas fa-wallet"></i></div>
+                <div class="value" id="balanceValue">₹0.00</div>
+                <div class="label">Available Balance</div>
+                <span class="badge badge-info">Updated</span>
+            </div>
+            <div class="status-card">
+                <div class="icon" style="color:#a18cd1"><i class="fas fa-chart-simple"></i></div>
+                <div class="value" id="marketStatusValue">--</div>
+                <div class="label">Market Status</div>
+                <span class="badge" id="marketStatusBadge">--</span>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon blue"><i class="fas fa-chart-bar"></i></div>
+                <div class="number" id="totalTrades">0</div>
+                <div class="label">Total Trades</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon green"><i class="fas fa-dollar-sign"></i></div>
+                <div class="number" id="netPnl">₹0.00</div>
+                <div class="label">Net P&L</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon yellow"><i class="fas fa-clock"></i></div>
+                <div class="number" id="openTrades">0</div>
+                <div class="label">Open Trades</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon purple"><i class="fas fa-trophy"></i></div>
+                <div class="number" id="winRate">0%</div>
+                <div class="label">Win Rate</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="action-grid">
+            <button class="action-btn primary" onclick="downloadData()">
+                <i class="fas fa-download"></i> Download Data
+            </button>
+            <button class="action-btn success" onclick="runStrategy()">
+                <i class="fas fa-play"></i> Run Strategy
+            </button>
+            <button class="action-btn warning" onclick="runBacktest()">
+                <i class="fas fa-flask"></i> Start Backtest
+            </button>
+            <button class="action-btn info" onclick="viewTrades()">
+                <i class="fas fa-list"></i> View Trades
+            </button>
+        </div>
+
+        <!-- Trades Container -->
+        <div id="tradesContainer" class="trades-container">
+            <h3><i class="fas fa-list"></i> All Trades</h3>
+            <div id="tradesTable"></div>
+        </div>
+    </div>
+
+        <script>
+        // ========================================
+        // CONFIGURATION
+        // ========================================
+        const API_BASE = 'http://localhost:8000';
+        let token = null;
+        let user = null;
+        let sessionExpiry = null;
+        let sessionTimer = null;
+
+        // ========================================
+        // DOM HELPERS
+        // ========================================
+        function $(id) { return document.getElementById(id); }
+
+        function showLoading() {
+            const overlay = $('loadingOverlay');
+            if (overlay) overlay.classList.add('show');
+        }
+
+        function hideLoading() {
+            const overlay = $('loadingOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function showLoginStatus(type, message) {
+            const status = $('loginStatus');
+            status.className = type;
+            status.textContent = message;
+        }
+
+        function showToast(message, type = 'info') {
+            let msg = message;
+            if (typeof message === 'object') {
+                try {
+                    msg = JSON.stringify(message);
+                } catch(e) {
+                    msg = String(message);
+                }
+            }
+            if (!msg || msg === 'undefined' || msg === 'null' || msg === '[object Object]') {
+                msg = 'Operation completed';
+            }
+            
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function formatCurrency(amount) {
+            if (amount === null || amount === undefined || isNaN(amount)) return '₹0.00';
+            return '₹' + Number(amount).toFixed(2);
+        }
+
+        function formatDate(date) {
+            if (!date) return '--';
+            try {
+                return new Date(date).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            } catch(e) { return date; }
+        }
+
+        function getTimeRemaining(expiry) {
+            const diff = expiry - Date.now();
+            if (diff <= 0) return 'Expired';
+            const m = Math.floor(diff / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // ========================================
+        // API FUNCTIONS
+        // ========================================
+        async function apiRequest(endpoint, options = {}) {
+            const headers = { 
+                'Content-Type': 'application/json'
+            };
+            
+            // Always add token if available
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            // Merge with any custom headers
+            if (options.headers) {
+                Object.assign(headers, options.headers);
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, { 
+                    ...options, 
+                    headers 
+                });
+                
+                let data;
+                try {
+                    data = await response.json();
+                } catch(e) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+                
+                if (response.status === 401) {
+                    handleSessionExpired();
+                    throw new Error('Session expired');
+                }
+                if (!response.ok) {
+                    const errorMsg = data.message || data.detail || `Server error: ${response.status}`;
+                    throw new Error(errorMsg);
+                }
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // ========================================
+        // AUTHENTICATION
+        // ========================================
+        function handleLogin() {
+            window.location.href = `${API_BASE}/auth/login`;
+        }
+
+        function handleRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const token_param = params.get('token');
+            const username = params.get('username');
+            const full_name = params.get('full_name');
+            
+            if (token_param) {
+                console.log('Received token from redirect');
+                
+                user = {
+                    username: username || 'User',
+                    full_name: full_name || username || 'User',
+                    status: 'Active'
+                };
+                
+                token = token_param;
+                
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                sessionExpiry = Date.now() + (30 * 60 * 1000);
+                localStorage.setItem('sessionExpiry', sessionExpiry.toString());
+                
+                showToast(`Welcome ${user.full_name}!`, 'success');
+                
+                loadDashboard().then(() => {
+                    $('loginPage').classList.add('hidden');
+                    $('dashboardPage').classList.add('active');
+                    startSessionTimer();
+                    updateTimeDisplay();
+                }).catch(err => {
+                    showToast('Failed to load dashboard: ' + (err.message || 'Unknown error'), 'error');
+                });
+                
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return true;
+            }
+            return false;
+        }
+
+        function handleSessionExpired() {
+            token = null;
+            user = null;
+            sessionExpiry = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('sessionExpiry');
+            if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+            $('loginPage').classList.remove('hidden');
+            $('dashboardPage').classList.remove('active');
+            showLoginStatus('error', 'Session expired. Please login again.');
+            showToast('Session expired. Please login again.', 'error');
+        }
+
+        function startSessionTimer() {
+            if (sessionTimer) clearInterval(sessionTimer);
+            sessionTimer = setInterval(() => {
+                if (sessionExpiry) {
+                    const remaining = getTimeRemaining(sessionExpiry);
+                    $('sessionTime').textContent = remaining;
+                    if (remaining === 'Expired') {
+                        handleSessionExpired();
+                    }
+                }
+                updateTimeDisplay();
+            }, 1000);
+        }
+
+        function updateTimeDisplay() {
+            const now = new Date();
+            const dateDisplay = $('currentDate');
+            const timeDisplay = $('currentTime');
+            
+            if (dateDisplay) {
+                dateDisplay.textContent = now.toLocaleDateString('en-IN', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+            if (timeDisplay) {
+                timeDisplay.textContent = now.toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+            }
+        }
+
+        function handleLogout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+            showLoading();
+            fetch(`${API_BASE}/auth/logout`, { method: 'POST' })
+                .finally(() => {
+                    token = null;
+                    user = null;
+                    sessionExpiry = null;
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('sessionExpiry');
+                    if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+                    $('loginPage').classList.remove('hidden');
+                    $('dashboardPage').classList.remove('active');
+                    hideLoading();
+                    showToast('Logged out successfully', 'success');
+                });
+        }
+
+        // ========================================
+        // DASHBOARD
+        // ========================================
+        async function loadDashboard() {
+            try {
+                showLoading();
+                
+                if (!user) {
+                    const savedUser = localStorage.getItem('user');
+                    if (savedUser) {
+                        user = JSON.parse(savedUser);
+                    }
+                }
+                
+                // Check if we have a token
+                if (!token) {
+                    const savedToken = localStorage.getItem('token');
+                    if (savedToken) {
+                        token = savedToken;
+                    } else {
+                        throw new Error('No token found. Please login again.');
+                    }
+                }
+                
+                $('userFullName').textContent = user?.full_name || 'User';
+                $('userUsername').textContent = user?.username || '--';
+                $('userStatusValue').textContent = user?.status || 'Active';
+                $('userStatusBadge').textContent = user?.status || 'Active';
+                $('userStatusBadge').className = `badge badge-${user?.status === 'Active' ? 'success' : 'danger'}`;
+                
+                const data = await apiRequest('/api/dashboard/dashboard-data');
+                console.log('Dashboard data:', data);
+                
+                $('accountStatusValue').textContent = data.account?.status || 'Active';
+                $('accountStatusBadge').textContent = data.account?.status || 'Active';
+                $('accountStatusBadge').className = `badge badge-${data.account?.status === 'Active' ? 'success' : 'danger'}`;
+                
+                $('balanceValue').textContent = formatCurrency(data.account?.balance || 0);
+                
+                $('marketStatusValue').textContent = data.market?.status || 'Closed';
+                $('marketStatusBadge').textContent = data.market?.status || 'Closed';
+                $('marketStatusBadge').className = `badge badge-${data.market?.status === 'Open' ? 'success' : 'danger'}`;
+                
+                $('totalTrades').textContent = data.statistics?.total_trades || 0;
+                
+                const pnl = data.statistics?.net_pnl || 0;
+                $('netPnl').textContent = formatCurrency(pnl);
+                $('netPnl').style.color = pnl >= 0 ? '#28a745' : '#dc3545';
+                
+                $('openTrades').textContent = data.statistics?.open_trades || 0;
+                $('winRate').textContent = `${data.statistics?.win_rate || 0}%`;
+                
+                if (!sessionExpiry) {
+                    sessionExpiry = Date.now() + (30 * 60 * 1000);
+                }
+                
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                if (error.message === 'Session expired' || error.message.includes('401')) {
+                    handleSessionExpired();
+                } else {
+                    showToast('Failed to load dashboard: ' + (error.message || 'Unknown error'), 'error');
+                }
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ========================================
+        // QUICK ACTIONS
+        // ========================================
+        async function downloadData() {
+            showLoading();
+            try {
+                const data = await apiRequest('/historical/download');
+                if (data.success) {
+                    showToast(data.message || 'Data downloaded successfully!', 'success');
+                    await loadDashboard();
+                } else {
+                    showToast(data.message || 'Download failed', 'error');
+                }
+            } catch (error) {
+                showToast('Download failed: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function runStrategy() {
+            showLoading();
+            try {
+                const data = await apiRequest('/strategy/run', { method: 'POST' });
+                if (data.success) {
+                    showToast(data.message || `Strategy completed!`, 'success');
+                    await loadDashboard();
+                } else {
+                    showToast(data.message || 'Strategy failed', 'error');
+                }
+            } catch (error) {
+                showToast('Strategy failed: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function runBacktest() {
+            showLoading();
+            try {
+                const data = await apiRequest('/strategy/backtest', { method: 'POST' });
+                if (data.success) {
+                    showToast('Backtest completed successfully!', 'success');
+                    await loadDashboard();
+                    if (data.trades && data.trades.length > 0) {
+                        showTrades(data.trades);
+                    }
+                    if (data.summary) {
+                        const summary = data.summary;
+                        let msg = `Net Profit: ${formatCurrency(summary.net_profit || 0)}`;
+                        msg += ` | Win Rate: ${summary.win_rate || 0}%`;
+                        msg += ` | Total Trades: ${summary.total_trades || 0}`;
+                        showToast(msg, 'info');
+                    }
+                } else {
+                    showToast(data.message || 'Backtest failed', 'error');
+                }
+            } catch (error) {
+                showToast('Backtest failed: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function viewTrades() {
+            showLoading();
+            try {
+                const data = await apiRequest('/api/dashboard/trades');
+                if (data.trades && data.trades.length > 0) {
+                    showTrades(data.trades);
+                    showToast(`Loaded ${data.trades.length} trades`, 'success');
+                } else {
+                    showToast('No trades found', 'info');
+                }
+            } catch (error) {
+                showToast('Failed to load trades: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showTrades(trades) {
+            const container = $('tradesContainer');
+            const table = $('tradesTable');
+            
+            if (!container || !table) return;
+            
+            container.classList.add('show');
+            
+            if (!trades || trades.length === 0) {
+                table.innerHTML = '<p style="text-align:center;color:#6c757d;padding:20px;">No trades found</p>';
+                return;
+            }
+            
+            let html = `<table class="trades-table"><thead><tr>
+                <th>ID</th><th>Symbol</th><th>Entry Time</th><th>Entry Price</th>
+                <th>Exit Price</th><th>P&L</th><th>Status</th>
+            </tr></thead><tbody>`;
+            
+            trades.slice(0, 50).forEach(t => {
+                const pnl = t.net_pnl || 0;
+                const color = pnl >= 0 ? '#28a745' : '#dc3545';
+                html += `<tr>
+                    <td><small>${(t.trade_id || '').substring(0, 8)}</small></td>
+                    <td>${t.symbol || 'NIFTY'}</td>
+                    <td>${formatDate(t.entry_time)}</td>
+                    <td>${formatCurrency(t.entry_price)}</td>
+                    <td>${t.exit_price ? formatCurrency(t.exit_price) : '-'}</td>
+                    <td style="color:${color};font-weight:600;">${formatCurrency(pnl)}</td>
+                    <td style="color:${t.trade_status === 'OPEN' ? '#28a745' : '#6c757d'};">${t.trade_status || 'OPEN'}</td>
+                </tr>`;
+            });
+            
+            html += `</tbody></table>`;
+            if (trades.length > 50) {
+                html += `<p style="margin-top:12px;color:#6c757d;font-size:13px;">Showing 50 of ${trades.length} trades</p>`;
+            }
+            table.innerHTML = html;
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initializing...');
+            
+            const loginBtn = $('loginButton');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', handleLogin);
+            }
+            
+            // Check for redirect with token
+            if (handleRedirect()) {
+                return;
+            }
+            
+            // Check for existing session
+            const savedToken = localStorage.getItem('token');
+            const savedUser = localStorage.getItem('user');
+            const savedExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (savedToken && savedUser && savedExpiry) {
+                const expiry = parseInt(savedExpiry);
+                if (expiry > Date.now()) {
+                    token = savedToken;
+                    user = JSON.parse(savedUser);
+                    sessionExpiry = expiry;
+                    console.log('Restoring session for user:', user);
+                    $('loginPage').classList.add('hidden');
+                    $('dashboardPage').classList.add('active');
+                    loadDashboard().then(() => {
+                        startSessionTimer();
+                        showToast('Welcome back!', 'info');
+                    }).catch(err => {
+                        console.error('Restore session error:', err);
+                        handleSessionExpired();
+                    });
+                    return;
+                }
+            }
+            
+            // Clear invalid session and show login
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('sessionExpiry');
+            $('loginPage').classList.remove('hidden');
+            $('dashboardPage').classList.remove('active');
+            console.log('Showing login page');
+        });
+
+        // Make functions globally accessible
+        window.downloadData = downloadData;
+        window.runStrategy = runStrategy;
+        window.runBacktest = runBacktest;
+        window.viewTrades = viewTrades;
+        window.handleLogout = handleLogout;
+    </script>
+</body>
+</html>
